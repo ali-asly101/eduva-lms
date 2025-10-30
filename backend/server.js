@@ -34,6 +34,7 @@ import { blockNonStudentEmail } from "./middleware/blockNonStudentEmail.js";
 import { signupStudent } from "./controllers/authController.js";
 
 const app = express();
+app.set("trust proxy", 1); // needed for secure cookies behind Railway
 
 // ---------- Session + Passport setup ----------
 app.use(
@@ -43,6 +44,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site
       maxAge: 24 * 60 * 60 * 1000,
     },
   })

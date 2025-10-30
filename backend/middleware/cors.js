@@ -3,6 +3,7 @@ import cors from "cors";
 
 // Build allowlist from common dev URLs and env vars
 const allowed = new Set([
+  process.env.FRONTEND_ORIGIN,
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
