@@ -21,7 +21,7 @@ import studentsProgressRoutes from "./routes/studentsProgress.routes.js";
 import completionStatusRoutes from "./routes/completionStatus.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import instructorCoursesRouter from "./routes/instructorCourses.routes.js";
-
+import cors from "cors"; 
 import { q } from "./db.js";
 import session from "express-session";
 import passport from "passport";
@@ -50,6 +50,16 @@ app.use(
   })
 );
 
+app.app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4000', 
+    'https://eduva-lms.vercel.app', // Your Vercel domain
+    'https://eduva-lms-production.up.railway.app' // Your Railway domain
+  ],
+  credentials: true
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -62,7 +72,6 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.use(corsMiddleware);
 app.use(express.json());
 
 // ---------- Routes ----------
