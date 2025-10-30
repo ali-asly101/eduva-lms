@@ -34,7 +34,7 @@ import { blockNonStudentEmail } from "./middleware/blockNonStudentEmail.js";
 import { signupStudent } from "./controllers/authController.js";
 
 const app = express();
-app.set("trust proxy", 1); // needed for secure cookies behind Railway
+app.set("trust proxy", 1);
 
 // ---------- Session + Passport setup ----------
 app.use(
@@ -44,7 +44,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-site
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
@@ -54,8 +54,8 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:4000', 
-    'https://eduva-lms.vercel.app', // Your Vercel domain
-    'https://eduva-lms-production.up.railway.app' // Your Railway domain
+    'https://eduva-lms.vercel.app',
+    'https://eduva-lms-production.up.railway.app'
   ],
   credentials: true
 }));
@@ -74,32 +74,54 @@ app.use((req, _res, next) => {
 
 app.use(express.json());
 
-// ---------- Routes ----------
-app.use("/api/auth", authRoutes);
+// ---------- CRITICAL: Railway-compatible health checks ----------
+// Root health check - MUST return 200 OK with JSON
+app.get("/", (_req, res) => {
+  res.status(200).json({ 
+    status: "ok",
+    service: "eduva-lms",
+    timestamp: new Date().toISOString()
+  });
+});
 
-// Health check route
+// Simple health check
+app.get("/health", (_req, res) => {
+  res.status(200).json({ 
+    status: "ok",
+    uptime: process.uptime()
+  });
+});
+
+// Health check with DB
 app.get("/api/health", async (_req, res) => {
   try {
     await q("SELECT 1");
-    res.json({ api: "ok", db: "ok" });
+    res.status(200).json({ 
+      api: "ok", 
+      db: "ok",
+      uptime: process.uptime()
+    });
   } catch (e) {
-    res.status(500).json({ api: "ok", db: "fail", error: e.message });
+    res.status(503).json({ 
+      api: "ok", 
+      db: "fail", 
+      error: e.message 
+    });
   }
 });
-app.get("/", (_req, res) => res.status(200).send("ok"));
-app.get("/health", (_req, res) => res.status(200).send("ok"));
-// Auth routes
+
+// ---------- Routes ----------
+app.use("/api/auth", authRoutes);
+
 app.get("/api/auth/me", (req, res) => {
   if (!req.user) return res.status(401).json({ user: null });
   res.json({ user: req.user });
 });
 
-// Student-only profile route
 app.get("/api/student/profile", requireStudent, (req, res) =>
   res.json({ user: req.user })
 );
 
-// Student email+password sign-up
 app.post(
   "/api/auth/signup",
   normalizeEmail("email"),
@@ -140,9 +162,18 @@ app.use(errorHandler);
 // ---------- Start server ----------
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Database: ${process.env.DATABASE_URL ? 'Connected via DATABASE_URL' : 'Using local config'}`);
   console.log(`CORS origins configured for Vercel and Railway`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, closing server gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
