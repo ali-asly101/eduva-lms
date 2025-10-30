@@ -77,7 +77,8 @@ app.get("/api/health", async (_req, res) => {
     res.status(500).json({ api: "ok", db: "fail", error: e.message });
   }
 });
-
+app.get("/", (_req, res) => res.status(200).send("ok"));
+app.get("/health", (_req, res) => res.status(200).send("ok"));
 // Auth routes
 app.get("/api/auth/me", (req, res) => {
   if (!req.user) return res.status(401).json({ user: null });
