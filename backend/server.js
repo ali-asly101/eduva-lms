@@ -138,7 +138,9 @@ if (process.env.NODE_ENV === "production") {
 app.use(errorHandler);
 
 // ---------- Start server ----------
-const port = process.env.PORT || 4000;
-app.listen(port, '0.0.0.0', () => {
-  console.log(`🌐 API running on http://localhost:${port}`);
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🌐 Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
