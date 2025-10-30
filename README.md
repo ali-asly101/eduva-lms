@@ -2,7 +2,7 @@
 
 This project is a **PERN stack** (PostgreSQL, Express, React, Node.js) application.  
 It comes with a simple **migration system** for managing your database schema over time.
-
+Commit history is not available as it was pulled from a private repo with Google Client Secret in commit history.
 ---
 
 ## 📦 Clone and Install
@@ -10,8 +10,7 @@ It comes with a simple **migration system** for managing your database schema ov
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://git.infotech.monash.edu/fit2101/fit2101-s2-2025/group-repo/MA_Wednesday1pm_Team1
-cd MA_Wednesday1pm_Team1
+git clone 
 npm install
 ```
 
