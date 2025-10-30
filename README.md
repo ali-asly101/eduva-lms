@@ -2,7 +2,7 @@
 
 This project is a **PERN stack** (PostgreSQL, Express, React, Node.js) application.  
 It comes with a simple **migration system** for managing your database schema over time.
-
+Commit history is not available as it was pulled from a private repo with Google Client Secret in commit history.
 ---
 
 ## 📦 Clone and Install
