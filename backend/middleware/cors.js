@@ -1,23 +1,28 @@
 // middleware/cors.js
 import cors from "cors";
 
-// Build allowlist from common dev URLs and env vars
-const allowed = new Set([
-  process.env.FRONTEND_ORIGIN,
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-]);
+// Function that builds allowlist at runtime (not during build)
+function getAllowedOrigins() {
+  const allowed = new Set([
+    process.env.FRONTEND_ORIGIN,
+    process.env.FRONTEND_URL,
+    process.env.CORS_ORIGIN,
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+  ].filter(Boolean)); // Remove undefined values
 
-// Honor env overrides if provided
-if (process.env.FRONTEND_URL) allowed.add(process.env.FRONTEND_URL);
-if (process.env.CORS_ORIGIN) allowed.add(process.env.CORS_ORIGIN);
+  return allowed;
+}
 
 // Also allow 127.0.0.1 on common Vite ports
 const localRegex = /^http:\/\/(localhost|127\.0\.0\.1):517\d$/;
 
 export const corsMiddleware = cors({
   origin(origin, cb) {
+    // Build allowed list at runtime (not at import time)
+    const allowed = getAllowedOrigins();
+    
     // allow non-browser tools (no Origin header)
     if (!origin) return cb(null, true);
     if (allowed.has(origin) || localRegex.test(origin)) return cb(null, true);
