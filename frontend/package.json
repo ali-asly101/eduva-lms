@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node server.js",
-    "migrate": "node runMigrations.js"
+    "migrate": "node runMigrations.js",
+    "prestart": "node backend/db-scripts/migrate.js"
   },
   "dependencies": {
     "axios": "^1.11.0",
