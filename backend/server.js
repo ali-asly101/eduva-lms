@@ -139,6 +139,6 @@ app.use(errorHandler);
 
 // ---------- Start server ----------
 const port = process.env.PORT || 4000;
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`🌐 API running on http://localhost:${port}`);
 });
