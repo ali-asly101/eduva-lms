@@ -141,6 +141,8 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌐 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Database: ${process.env.DATABASE_URL ? 'Connected via DATABASE_URL' : 'Using local config'}`);
+  console.log(`CORS origins configured for Vercel and Railway`);
 });
