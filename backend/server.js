@@ -1,4 +1,4 @@
-// backend/server.js
+// backend/server.js - API ONLY (no frontend serving)
 import express from "express";
 import 'dotenv/config';
 import path from "path";
@@ -55,7 +55,7 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:4000', 
     'https://eduva-lms.vercel.app',
-    'https://eduva-lms-production.up.railway.app'
+    'https://eduva-lms.onrender.com'
   ],
   credentials: true
 }));
@@ -74,39 +74,28 @@ app.use((req, _res, next) => {
 
 app.use(express.json());
 
-// ---------- CRITICAL: Railway-compatible health checks ----------
-// Root health check - MUST return 200 OK with JSON
+// ---------- Health Checks ----------
 app.get("/", (_req, res) => {
-  res.status(200).json({ 
+  res.json({ 
     status: "ok",
-    service: "eduva-lms",
+    message: "Eduva LMS API",
     timestamp: new Date().toISOString()
   });
 });
 
-// Simple health check
 app.get("/health", (_req, res) => {
-  res.status(200).json({ 
+  res.json({ 
     status: "ok",
     uptime: process.uptime()
   });
 });
 
-// Health check with DB
 app.get("/api/health", async (_req, res) => {
   try {
     await q("SELECT 1");
-    res.status(200).json({ 
-      api: "ok", 
-      db: "ok",
-      uptime: process.uptime()
-    });
+    res.json({ api: "ok", db: "ok" });
   } catch (e) {
-    res.status(503).json({ 
-      api: "ok", 
-      db: "fail", 
-      error: e.message 
-    });
+    res.status(503).json({ api: "ok", db: "fail", error: e.message });
   }
 });
 
@@ -142,19 +131,6 @@ app.use("/api/completionStatus", completionStatusRoutes);
 app.use("/api/instructor-courses", instructorCoursesRouter);
 app.use("/api/instructors", instructorsRoutes);
 app.use("/api/reports", reportsRoutes);
-
-// ---------- Serve frontend in production ----------
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-if (process.env.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../frontend/dist");
-  app.use(express.static(frontendPath));
-
-  app.get("*", (_, res) =>
-    res.sendFile(path.join(frontendPath, "index.html"))
-  );
-}
 
 // ---------- Error handler ----------
 app.use(errorHandler);
