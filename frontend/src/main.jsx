@@ -5,7 +5,13 @@ import axios from "axios";
 import App from "./App.jsx";
 import "./index.css";
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://eduva-lms.onrender.com';
+
+console.log('🔧 Using API URL:', API_URL);
+console.log('🔧 VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+console.log('🔧 All env vars:', import.meta.env);
+
+axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById("root")).render(
